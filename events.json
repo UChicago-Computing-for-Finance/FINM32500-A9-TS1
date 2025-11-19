@@ -168,5 +168,80 @@
       "old_state": "NEW",
       "new_state": "REJECTED"
     }
+  },
+  {
+    "timestamp": "2025-11-18T21:19:59.572934",
+    "event_type": "ORDER_CREATED",
+    "data": {
+      "symbol": "AAPL",
+      "qty": 500,
+      "side": "1",
+      "state": "NEW"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T21:19:59.573196",
+    "event_type": "RISK_APPROVED",
+    "data": {
+      "symbol": "AAPL",
+      "qty": 500,
+      "side": "1",
+      "passed": true
+    }
+  },
+  {
+    "timestamp": "2025-11-18T21:19:59.573521",
+    "event_type": "STATE_CHANGE",
+    "data": {
+      "symbol": "AAPL",
+      "qty": 500,
+      "side": "1",
+      "old_state": "NEW",
+      "new_state": "ACKED"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T21:19:59.573684",
+    "event_type": "STATE_CHANGE",
+    "data": {
+      "symbol": "AAPL",
+      "qty": 500,
+      "side": "1",
+      "old_state": "NEW",
+      "new_state": "ACKED"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T21:19:59.573871",
+    "event_type": "STATE_CHANGE",
+    "data": {
+      "symbol": "AAPL",
+      "qty": 500,
+      "side": "1",
+      "old_state": "ACKED",
+      "new_state": "FILLED"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T21:19:59.574035",
+    "event_type": "STATE_CHANGE",
+    "data": {
+      "symbol": "AAPL",
+      "qty": 500,
+      "side": "1",
+      "old_state": "ACKED",
+      "new_state": "FILLED"
+    }
+  },
+  {
+    "timestamp": "2025-11-18T21:19:59.574203",
+    "event_type": "POSITION_UPDATE",
+    "data": {
+      "symbol": "AAPL",
+      "old_position": 0,
+      "new_position": 500,
+      "order_qty": 500,
+      "order_side": "1"
+    }
   }
 ]
