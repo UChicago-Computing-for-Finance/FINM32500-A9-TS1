@@ -1,3 +1,5 @@
+from utils.fix_class import FixClass
+
 class FixParser:
     """
     Parse FIX protocol messages into structured dictionaries.
@@ -97,6 +99,57 @@ class FixParser:
             self._validate_message(parsed)
         
         return parsed
+
+    def parse_to_object(self, raw_message: str, delimiter='|', validate=True) -> FixClass:
+        """
+        Parse a FIX message string into a dictionary.
+        
+        Args:
+            raw_message: Raw FIX message (fields separated by delimiter)
+            delimiter: Field separator (default '|', use '\x01' for SOH)
+            validate: Whether to validate required tags
+            
+        Returns:
+            Dictionary with tag numbers as keys and values as strings
+            
+        Raises:
+            ValueError: If message is invalid or required tags are missing
+        """
+        if not raw_message:
+            raise ValueError("Empty FIX message")
+        
+        # Split message into tag=value pairs
+        fields = [f.strip() for f in raw_message.split(delimiter) if f.strip()]
+        
+        if not fields:
+            raise ValueError("No valid fields in FIX message")
+        
+        parsed = {}
+        
+        for field in fields:
+            if '=' not in field:
+                raise ValueError(f"Invalid FIX field format: '{field}' (missing '=')")
+            
+            tag, value = field.split('=', 1)
+            tag = tag.strip()
+            value = value.strip()
+            
+            if not tag:
+                raise ValueError("Empty tag in FIX field")
+            
+            parsed[tag] = value
+        
+        # Validate message has MsgType (tag 35)
+        if '35' not in parsed:
+            raise ValueError("Missing required tag 35 (MsgType)")
+        
+        # Perform validation if requested
+        if validate:
+            self._validate_message(parsed)
+
+        fix_obj = FixClass(parsed)
+        
+        return fix_obj
     
     def _validate_message(self, parsed: dict):
         """
