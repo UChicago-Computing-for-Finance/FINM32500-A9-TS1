@@ -1,3 +1,6 @@
+from logger import Logger
+
+
 class RiskEngine:
     """
     Risk management engine that enforces position and order size limits.
@@ -5,17 +8,20 @@ class RiskEngine:
     Tracks positions per symbol and validates orders before execution.
     """
     
-    def __init__(self, max_order_size=1000, max_position=2000):
+    def __init__(self, max_order_size=1000, max_position=2000, use_logger=True):
         """
         Initialize the risk engine.
         
         Args:
             max_order_size: Maximum quantity allowed per order
             max_position: Maximum absolute position allowed per symbol
+            use_logger: Whether to log events
         """
         self.max_order_size = max_order_size
         self.max_position = max_position
         self.positions = {}  # symbol -> net position (positive=long, negative=short)
+        self.use_logger = use_logger
+        self.logger = Logger() if use_logger else None
     
     def check(self, order) -> bool:
         """
@@ -34,7 +40,10 @@ class RiskEngine:
         
         # Check 1: Order size limit
         if qty > self.max_order_size:
-            print(f"RISK REJECT: Order size {qty} exceeds max order size {self.max_order_size} for {symbol}")
+            reason = f"Order size {qty} exceeds max order size {self.max_order_size}"
+            print(f"RISK REJECT: {reason} for {symbol}")
+            if self.use_logger:
+                self.logger.log_risk_check(order, False, reason)
             return False
         
         # Get current position for this symbol (default to 0)
@@ -47,7 +56,10 @@ class RiskEngine:
         elif side in ['2', 'SELL', 'Sell']:
             position_change = -qty
         else:
-            print(f"RISK REJECT: Invalid side '{side}' for {symbol}")
+            reason = f"Invalid side '{side}'"
+            print(f"RISK REJECT: {reason} for {symbol}")
+            if self.use_logger:
+                self.logger.log_risk_check(order, False, reason)
             return False
         
         # Calculate hypothetical new position
@@ -55,11 +67,15 @@ class RiskEngine:
         
         # Check 2: Position limit (absolute value)
         if abs(new_position) > self.max_position:
-            print(f"RISK REJECT: New position {new_position} would exceed max position "
-                  f"±{self.max_position} for {symbol} (current: {current_position})")
+            reason = f"New position {new_position} would exceed max position ±{self.max_position} (current: {current_position})"
+            print(f"RISK REJECT: {reason} for {symbol}")
+            if self.use_logger:
+                self.logger.log_risk_check(order, False, reason)
             return False
         
         # All checks passed
+        if self.use_logger:
+            self.logger.log_risk_check(order, True)
         return True
     
     def update_position(self, order):
@@ -90,6 +106,10 @@ class RiskEngine:
         
         print(f"POSITION UPDATE: {symbol} {current_position:+d} -> {new_position:+d} "
               f"(filled {qty} {side})")
+        
+        # Log position update
+        if self.use_logger:
+            self.logger.log_position_update(symbol, current_position, new_position, order)
     
     def get_position(self, symbol):
         """Get current position for a symbol."""
